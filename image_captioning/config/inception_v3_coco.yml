@@ -1,0 +1,32 @@
+MODEL:
+  BACKBONE:
+    NAME: "inception_v3"
+DATASET:
+  NAME: "coco"
+SOLVER:
+  OUTPUT_DIR: "OUTPUT\\inception_v3_coco\\"
+  LR:
+    POLICY: "cosine"
+    START: 1e-3
+    FINAL: 1e-4
+  WARMUP:
+    START: 1e-8
+    STEPS: 1000
+
+#Height,WIDTH
+  INPUT_SIZE:
+    - 128
+    - 128
+  EPOCH_TOTAL: 100
+  BATCH_SIZE: 64
+  FREEZE_BACKBONE: True # not update backbone to speedup training process
+  CLIP_GRADIENT: -1
+
+EVALUATION:
+  CODEC:
+    - "pretrained/30ENCODER_1.55328.ckpt"
+    - "pretrained/30DECODER_1.55328.ckpt"
+  TOKENIZER: "pretrained/tokenizer.json"
+  IMAGES: "test_images\\"
+  OUTPUT_DIR: "OUTPUT\\test_images\\"
+  "MAX_NUM": 100

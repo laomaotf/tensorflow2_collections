@@ -1,0 +1,32 @@
+MODEL:
+  BACKBONE:
+    NAME: "vgg16"
+DATASET:
+  NAME: "coco"
+SOLVER:
+  OUTPUT_DIR: "OUTPUT\\vgg16_coco\\"
+  LR:
+    POLICY: "cosine"
+    START: 1e-3
+    FINAL: 1e-4
+  WARMUP:
+    START: 1e-8
+    STEPS: 1000
+
+#Height,WIDTH
+  INPUT_SIZE:
+    - 128
+    - 128
+  EPOCH_TOTAL: 30
+  BATCH_SIZE: 64
+  FREEZE_BACKBONE: True # not update backbone to speedup training process
+  CLIP_GRADIENT: -1
+
+EVALUATION:
+  CODEC:
+    - "pretrained/25ENCODER.ckpt"
+    - "pretrained/25DECODER.ckpt"
+  TOKENIZER: "pretrained/tokenizer.json"
+  IMAGES: "test_images\\"
+  OUTPUT_DIR: "OUTPUT\\test_images\\"
+  "MAX_NUM": 100
