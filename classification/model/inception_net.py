@@ -31,11 +31,12 @@ def GetInceptionV3(input_shape,class_num, pretrain_weight="imagenet", freeze_bac
 
 
 if __name__ == "__main__":
-    #model = GetInceptionV3((224,224,3),100,freeze_backbone=True)
-    model = CLASS_INCEPTION_V3(100)
+    #convert h5 to savedmodel
+    model = GetInceptionV3((224,224,3),100,freeze_backbone=True)
+    #model = CLASS_INCEPTION_V3(100)
     os.makedirs("output\\food",exist_ok=True)
-    model.save_weights("output\\inception.ckpt")
-    model.load_weights("output\\inception.ckpt")
+    model.save_weights("output\\inception.h5")
+    model.load_weights("output\\inception.h5")
 
     print("start savedmdodel....................................")
     model.save("output\\food")

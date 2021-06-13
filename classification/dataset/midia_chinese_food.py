@@ -6,12 +6,21 @@ from .base import CLASS_DATASET_BASE
 CLASS_DATASET_MIDIA_CHINESE_FOOD_MEAN = tf.constant([0.485, 0.456, 0.406], dtype=tf.float32)
 CLASS_DATASET_MIDIA_CHINESE_FOOD_STD = tf.constant([0.229, 0.224, 0.225], dtype=tf.float32)
 CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM = 208
+
+RESIZING_SIZE = (256,256)
+INPUT_SIZE = (224,224)
+#RESIZING_SIZE = (128,128)
+#INPUT_SIZE = (96,96)
+
+
+CROP_RATIO = INPUT_SIZE[0] * 1.0 / RESIZING_SIZE[0]
+
 #不做增广加载图片
 def loadImage(image_path):
     data = tf.io.read_file(image_path)
     data = tf.image.decode_jpeg(data, channels=3)
-    data = tf.image.resize(data, (256, 256))
-    data = tf.image.central_crop(data, 0.875)
+    data = tf.image.resize(data, RESIZING_SIZE)
+    data = tf.image.central_crop(data, CROP_RATIO)
     data = (data / 255.0 - CLASS_DATASET_MIDIA_CHINESE_FOOD_MEAN) / CLASS_DATASET_MIDIA_CHINESE_FOOD_STD
     return data
 
@@ -26,7 +35,8 @@ class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
                  ):
         super(CLASS_DATASET_MIDIA_CHINESE_FOOD,self).__init__("midia_chinese_food",dataset_root,
                                                               split, batch_size,input_size)
-        self.input_size_ = (224,224) if input_size is None else input_size
+        #self.input_size_ = (224,224) if input_size is None else input_size
+        self.input_size_ = INPUT_SIZE if input_size is None else input_size
         self.image_root_ = os.path.join(self.dataset_root_,split)
         self.paths_list_, self.classes_list_ = self.loadAnnotation(split)
         self.classes_ = list(set(self.classes_list_))
@@ -65,7 +75,7 @@ class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
         random.shuffle(paths)
         classes = [path2class[x] for x in paths]
         return paths, classes
-
+    @tf.function
     def loadImage(self,image_path):
         data = tf.io.read_file(image_path)
         data = tf.image.decode_jpeg(data, channels=3)
@@ -76,11 +86,11 @@ class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
             data = tf.image.random_flip_up_down(data)
             data = tf.image.random_brightness(data,0.5)
             #data = tf.image.resize_with_crop_or_pad(data, self.input_size_)
-            data = tf.image.resize(data, (256,256))
+            data = tf.image.resize(data, RESIZING_SIZE)
             data = tf.image.random_crop(data, (*self.input_size_,3))
         else:
-            data = tf.image.resize(data, (256, 256))
-            data = tf.image.central_crop(data,0.875)
+            data = tf.image.resize(data, RESIZING_SIZE)
+            data = tf.image.central_crop(data,CROP_RATIO)
 
 
         data = (data / 255.0 - self.mean_) / self.std_
@@ -91,6 +101,7 @@ class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
     def getStepPerEpoch(self):
         return self.step_per_epoch_
     def getDataset(self):
+        @tf.function
         def _convert(image_path, image_class):
             image_data = self.loadImage(image_path)
             return image_data, image_class

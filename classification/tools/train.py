@@ -7,6 +7,8 @@ import re, time, random, math, pickle
 from dataset.midia_chinese_food import CLASS_DATASET_MIDIA_CHINESE_FOOD as CLASS_DATASET
 from config.base import get_cfg_defaults
 from model.inception_net import GetInceptionV3
+from model.vgg import GetVGG
+from model.resnet import GetResnet
 from solver.lr_schedule import CLASS_COSINE_LR
 from utils.stepup_logging import setup
 import logging
@@ -49,9 +51,21 @@ def create_dataset(CFG):
 
 
 def create_model(CFG, dataset_train_object):
-    model_object = GetInceptionV3(
-        (*dataset_train_object.input_size_,3),
-        len(dataset_train_object.getClassList()),CFG.MODEL.PRETRAINED,freeze_backbone=CFG.SOLVER.FREEZE_BACKBONE)
+    if CFG.MODEL.NAME.lower() == "inception_v3":
+        model_object = GetInceptionV3(
+            (*dataset_train_object.input_size_,3),
+            len(dataset_train_object.getClassList()),CFG.MODEL.PRETRAINED,freeze_backbone=CFG.SOLVER.FREEZE_BACKBONE)
+    elif CFG.MODEL.NAME.lower() == "vgg":
+        model_object = GetVGG(
+            (*dataset_train_object.input_size_, 3),
+            len(dataset_train_object.getClassList()), CFG.MODEL.PRETRAINED, freeze_backbone=CFG.SOLVER.FREEZE_BACKBONE)
+    elif CFG.MODEL.NAME.lower() == "resnet":
+        model_object = GetResnet(
+            (*dataset_train_object.input_size_, 3),
+            len(dataset_train_object.getClassList()), CFG.MODEL.PRETRAINED, freeze_backbone=CFG.SOLVER.FREEZE_BACKBONE)
+    else:
+        logging.error(f"UNK net arch {CFG.MODEL.NAME}")
+        return None
     if DEBUG_ON:
         imgs, classes = next(iter(dataset_train_object))
         preds = model_object(imgs,training=True)
@@ -102,6 +116,7 @@ def train_model(CFG,train_dataset,
         for step_num,(images, classes) in tqdm(enumerate(train_dataset),desc="training"):
             _train_step_one(images,classes)
             lr_policy.step(epoch_num * step_per_epoch + step_num)
+          
         t1 = time.time()
         if (1+epoch_num) % 5 == 0 and not(val_dataset is None):
             validation_model(val_dataset,model)
@@ -127,6 +142,7 @@ def validation_model(val_dataset,model):
         batch_num += 1
         val_loss.update_state(batch_loss)
         val_accuracy.update_state(image_class,preds)
+
     t1 = time.time()
     logging.info(
         f"VAL Loss {val_loss.result():.5f} accuracy {val_accuracy.result():.3f} time/batch {(t1 - t0) / (3600.0*batch_num):.3f} hours"
@@ -142,6 +158,7 @@ def train_network(config_file):
     setup("train_network",f"{CFG.SOLVER.OUTPUT_DIR}/logs/")
 
     logging.info("========================train with configure===========================================")
+    logging.info(f"tf version:  {tf.__version__}")
     logging.info(f"{CFG}")
     logging.info("===================================================================")
 
@@ -151,13 +168,15 @@ def train_network(config_file):
     #################################
     #MODEL
     model = create_model(CFG,dataset_train_object)
+    if model is None:
+        return None
     #################################
     #TRAIN
     model_object = train_model(CFG,dataset_train, model, CFG.SOLVER.EPOCH_TOTAL,
                                dataset_train_object.getStepPerEpoch(),val_dataset=dataset_val)
     #################################
     #VALIDATION
-    validation_model(CFG,dataset_val, model_object)
+    validation_model(dataset_val, model_object)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
