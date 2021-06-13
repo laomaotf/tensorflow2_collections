@@ -89,7 +89,9 @@ def evaluate_model(CFG,model):
         if CFG.EVALUATION.MAX_NUM > 0 and len(time_cost) >= CFG.EVALUATION.MAX_NUM:
             print(f"WARNING: stop before finishing all images {len(paths)}")
             break
-
+    # input = tf.constant(0,shape=(1,224,224,3),dtype=tf.float32)
+    # model._set_inputs(input,training=False)
+    # model.save("output\\food")
     df = pd.DataFrame({"class":list(classes_found.keys()), "num":list(classes_found.values())})
     df = df.sort_values("num",ascending=False)
     df.to_csv(os.path.join(CFG.EVALUATION.OUTPUT_DIR,"evaluation_results.csv"),index=False)
@@ -105,6 +107,8 @@ if __name__ == "__main__":
     CFG.merge_from_file(args.config_file)
     CFG.freeze()
     model = create_model(CFG)
+
+
     evaluate_model(CFG,model)
 
 

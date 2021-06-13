@@ -4,7 +4,7 @@ _C = CN()
 
 _C.MODEL = CN()
 _C.MODEL.NAME = "inception_v3"
-_C.MODEL.PRETRAINED = "inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5"
+_C.MODEL.PRETRAINED = "imagenet"
 
 _C.DATASET = CN()
 _C.DATASET.NAME = "midia_chinese_food"

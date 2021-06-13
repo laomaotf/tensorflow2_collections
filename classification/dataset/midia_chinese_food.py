@@ -16,7 +16,6 @@ def loadImage(image_path):
     return data
 
 class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
-    #dataset_root_ = "D:\\dataset\\midia_chinese_food\\release_data\\"
     mean_ = CLASS_DATASET_MIDIA_CHINESE_FOOD_MEAN
     std_ = CLASS_DATASET_MIDIA_CHINESE_FOOD_STD
     def __init__(self,
@@ -28,10 +27,10 @@ class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
         super(CLASS_DATASET_MIDIA_CHINESE_FOOD,self).__init__("midia_chinese_food",dataset_root,
                                                               split, batch_size,input_size)
         self.input_size_ = (224,224) if input_size is None else input_size
-        self.image_root_ = os.path.join(self.dataset_root,split)
+        self.image_root_ = os.path.join(self.dataset_root_,split)
         self.paths_list_, self.classes_list_ = self.loadAnnotation(split)
         self.classes_ = list(set(self.classes_list_))
-        assert self.classes_ == CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM, f"CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM == {CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM}"
+        assert len(self.classes_) == CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM, f"CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM == {CLASS_DATASET_MIDIA_CHINESE_FOOD_CLASS_NUM}"
         self.step_per_epoch_ = len(self.paths_list_)//batch_size
         return
     def loadAnnotation(self,split):
@@ -100,12 +99,11 @@ class CLASS_DATASET_MIDIA_CHINESE_FOOD(CLASS_DATASET_BASE):
 
         dataset = tf.data.Dataset.from_tensor_slices(
             (self.paths_list_, self.classes_list_)
-        )
+        ).shuffle(1024,reshuffle_each_iteration=True)
         dataset = dataset.with_options(ignore_order)
         #dataset = dataset.repeat()
         dataset = dataset.map(
             _convert, num_parallel_calls=tf.data.experimental.AUTOTUNE
-        )
-        dataset = dataset.shuffle(1024,reshuffle_each_iteration=True).batch(self.batch_size_,drop_remainder=True)
+        ).batch(self.batch_size_,drop_remainder=True)
         dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
         return dataset
