@@ -1,0 +1,23 @@
+NET:
+  BACKBONE: "toy_model"
+  WEIGHTS: ""
+
+TRAIN:
+  OPTIMIZER: "SGD"
+  NUM_EPOCHS: 40
+  BATCH_SIZE: 8
+  LR:
+    ANNEALING: "COSINE"
+    START: 0.001
+    STOP: 1e-9
+    MOMENTUM: 0.9
+    WARMUP:
+      START: 1e-9
+      ITERATION: 100
+
+DATA:
+  TRAIN: "train_data\\voc_2007_trainval_512X640_4.tfrecord"
+  VAL: "train_data\\voc_2007_test_512X640_4.tfrecord"
+
+
+

@@ -1,0 +1,27 @@
+NET:
+  BACKBONE: "resnet50"
+  WEIGHTS: "pretrained/best_model.h5"
+  FREEZE_BACKBONE: false
+  FREEZE_BACKBONE_BN: true
+
+TRAIN:
+  OPTIMIZER: "SGD"
+  NUM_EPOCHS: 30
+  BATCH_SIZE: 4
+  VALIDATION_EPOCH_STEP: 5
+  SAVE_EPOCH_STEP: 5
+  LR:
+    ANNEALING: "COSINE"
+    START: 0.001
+    STOP: 1e-9
+    MOMENTUM: 0.9
+    WARMUP:
+      START: 1e-9
+      ITERATION: 1000
+
+DATA:
+  TRAIN: "train_data\\voc_2007_trainval_512X640_4.tfrecord"
+  VAL: "train_data\\voc_2007_test_512X640_4.tfrecord"
+
+
+
