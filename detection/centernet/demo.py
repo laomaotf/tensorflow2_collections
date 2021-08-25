@@ -1,9 +1,7 @@
 import os,random,cv2
 import numpy as np
 import tensorflow as tf
-from PIL import Image,ImageDraw
 from matplotlib import  pyplot as plt
-from networks import toy_model,resnet
 from utils.nms import NMS
 from tqdm import tqdm
 model_path = "pretrained/best_model.h5"
@@ -61,7 +59,9 @@ def demo_entry():
             y0, y1 = int(y0 * DOWN_RATIO), int(y1 * DOWN_RATIO)
             cv2.rectangle(img,(x0, y0),(x1, y1), (255,0,0),1)
             cv2.putText(img,f"{CLASS_NAMES[cls]}",(x0,y0), cv2.FONT_HERSHEY_PLAIN,2.0,(0,255,0),1)
-        cv2.imshow("results",img)
-        cv2.waitKey(-1)
+        img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        plt.imshow(img)
+        plt.axis("off")
+        plt.show()
 if __name__ == "__main__":
     demo_entry()
