@@ -1,0 +1,24 @@
+
+NAME: "voc2007_resnet50_384x384"
+
+TRAIN:
+  EPOCH_TOTAL: 50
+  BATCH_SIZE : 8
+  DATA: "train_data/voc_2007_trainval_384X384.tfrecord"
+  OPTIMIZER: "sgd"
+  OUTPUT_FOLDER: "train_test_out/voc2007_resnet50_train"
+  TEST_FREQ: 1
+
+SGD:
+  LR_START : 0.001
+  LR_END : 1e-8
+  MOMENTUM: 0.9
+  LR_POLICY: "linear"
+
+
+TEST:
+  DATA: "train_data/voc_2007_test_384X384.tfrecord"
+  BATCH_SIZE: 1
+  OUTPUT_FOLDER: "train_test_out/voc2007_resnet50_test"
+
+
