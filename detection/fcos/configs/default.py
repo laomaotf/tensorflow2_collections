@@ -11,6 +11,7 @@ _C.TRAIN.DATA = ""
 _C.TRAIN.OPTIMIZER = "sgd"
 _C.TRAIN.TEST_FREQ = 5 #epoch
 _C.TRAIN.OUTPUT_FOLDER = ""
+_C.TRAIN.INPUT_SIZE = [0,0] #Height Width
 
 _C.SGD = CN()
 _C.SGD.LR_START = 0.001
